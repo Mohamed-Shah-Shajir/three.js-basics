@@ -54,16 +54,47 @@ imageSphere.scale.set(0.85, 0.85, 0.85);
 
 scene.add(imageSphere);
 
+// ===== 3D GLOWING RING (TORUS) =====
+const ringGeometry = new THREE.TorusGeometry(
+  0.55,   // ring radius (distance from center)
+  0.06,   // tube thickness
+  32,     // tube segments
+  100     // smoothness
+);
+
+const ringMaterial = new THREE.MeshStandardMaterial({
+  color: 0x00ffff,      // alien cyan
+  emissive: 0x00ffff,   // glow effect
+  emissiveIntensity: 1.5,
+});
+
+const hoverRing = new THREE.Mesh(ringGeometry, ringMaterial);
+
+// Make ring horizontal
+hoverRing.rotation.x = Math.PI / 2;
+
+// Position below the sphere
+hoverRing.position.y = -0.65;
+
+scene.add(hoverRing);
+
+
+
 // Floating animation
 const clock = new THREE.Clock();
 
 function animate() {
+  
   requestAnimationFrame(animate);
 
   const t = clock.getElapsedTime();
   imageSphere.position.y = Math.sin(t) * 0.2;
 
   renderer.render(scene, camera);
+  // 3D ring pulse + slow rotation
+hoverRing.scale.setScalar(1 + Math.sin(t * 3) * 0.05);
+hoverRing.rotation.z += 0.009;
+
 }
 animate();
 
