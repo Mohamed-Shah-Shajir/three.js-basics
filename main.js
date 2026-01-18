@@ -78,6 +78,48 @@ hoverRing.position.y = -0.65;
 
 scene.add(hoverRing);
 
+// ===== AURA SPOT LIGHT (PROJECTING UPWARD) =====
+const auraLight = new THREE.SpotLight(
+  0x00ffff,   // cyan alien light
+  2,          // intensity
+  6,          // distance
+  Math.PI / 6,// spread angle
+  0.5,        // softness
+  1           // decay
+);
+
+// Position light inside the ring
+auraLight.position.set(0, -0.65, 0);
+auraLight.target.position.set(0, 0.5, 0);
+
+scene.add(auraLight);
+scene.add(auraLight.target);
+
+// ===== ENERGY WAVES =====
+const waveGroup = new THREE.Group();
+scene.add(waveGroup);
+
+const waveGeometry = new THREE.RingGeometry(0.45, 0.48, 64);
+
+const waveMaterial = new THREE.MeshBasicMaterial({
+  color: 0x00ffff,
+  transparent: true,
+  opacity: 0.6,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+});
+
+// Create multiple waves
+const waves = [];
+for (let i = 0; i < 3; i++) {
+  const wave = new THREE.Mesh(waveGeometry, waveMaterial.clone());
+  wave.rotation.x = -Math.PI / 2;
+  wave.position.y = -0.65;
+  wave.scale.setScalar(1 + i * 0.25);
+  waveGroup.add(wave);
+  waves.push(wave);
+}
+
 
 
 // Floating animation
@@ -89,6 +131,16 @@ function animate() {
 
   const t = clock.getElapsedTime();
   imageSphere.position.y = Math.sin(t) * 0.2;
+
+  // ===== ENERGY WAVE ANIMATION =====
+waves.forEach((wave, i) => {
+  const speed = 0.4;
+  const offset = i * 0.5;
+
+  wave.position.y = -0.65 + ((t * speed + offset) % 1.2);
+  wave.material.opacity = 0.4 * (1 - (wave.position.y + 0.65));
+});
+
 
   renderer.render(scene, camera);
   // 3D ring pulse + slow rotation
