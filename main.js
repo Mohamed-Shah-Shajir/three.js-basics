@@ -3,6 +3,19 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 // Scene
 const scene = new THREE.Scene();
 
+// ===== SPACE GRADIENT BACKGROUND =====
+const bgGeometry = new THREE.SphereGeometry(20, 64, 64);
+
+const bgMaterial = new THREE.MeshBasicMaterial({
+  side: THREE.BackSide,
+  color: 0x050812, // base deep space color
+});
+
+const backgroundSphere = new THREE.Mesh(bgGeometry, bgMaterial);
+scene.add(backgroundSphere);
+
+
+
 // Camera
 const camera = new THREE.PerspectiveCamera(
   60,
