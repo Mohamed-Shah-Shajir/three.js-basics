@@ -14,6 +14,35 @@ const bgMaterial = new THREE.MeshBasicMaterial({
 const backgroundSphere = new THREE.Mesh(bgGeometry, bgMaterial);
 scene.add(backgroundSphere);
 
+// ===== STAR FIELD =====
+const starCount = 800;
+
+const starGeometry = new THREE.BufferGeometry();
+const starPositions = [];
+
+for (let i = 0; i < starCount; i++) {
+  const x = (Math.random() - 0.5) * 40;
+  const y = (Math.random() - 0.5) * 40;
+  const z = (Math.random() - 0.5) * 40;
+  starPositions.push(x, y, z);
+}
+
+starGeometry.setAttribute(
+  "position",
+  new THREE.Float32BufferAttribute(starPositions, 3)
+);
+
+const starMaterial = new THREE.PointsMaterial({
+  color: 0xffffff,
+  size: 0.06,
+  transparent: true,
+  opacity: 0.8,
+});
+
+const stars = new THREE.Points(starGeometry, starMaterial);
+scene.add(stars);
+
+
 
 
 // Camera
@@ -153,6 +182,9 @@ waves.forEach((wave, i) => {
   wave.position.y = -0.65 + ((t * speed + offset) % 1.2);
   wave.material.opacity = 0.4 * (1 - (wave.position.y + 0.65));
 });
+
+// Subtle star drift
+stars.rotation.y += 0.0003;
 
 
   renderer.render(scene, camera);
