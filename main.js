@@ -20,6 +20,13 @@ const starCount = 800;
 const starGeometry = new THREE.BufferGeometry();
 const starPositions = [];
 
+// Store random phase for twinkling
+const starTwinklePhase = [];
+for (let i = 0; i < starCount; i++) {
+  starTwinklePhase.push(Math.random() * Math.PI * 2);
+}
+
+
 for (let i = 0; i < starCount; i++) {
   const x = (Math.random() - 0.5) * 40;
   const y = (Math.random() - 0.5) * 40;
@@ -185,6 +192,14 @@ waves.forEach((wave, i) => {
 
 // Subtle star drift
 stars.rotation.y += 0.0003;
+
+// ===== TWINKLING STARS =====
+const twinkle = 0.15 + Math.sin(t * 2) * 0.05; // base twinkle
+stars.material.opacity = 0.6 + twinkle;
+
+// Subtle size flicker (safe for PointsMaterial)
+stars.material.size = 0.04 + Math.sin(t * 3) * 0.01;
+
 
 
   renderer.render(scene, camera);
