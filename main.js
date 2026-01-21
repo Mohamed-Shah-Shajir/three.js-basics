@@ -49,6 +49,58 @@ const starMaterial = new THREE.PointsMaterial({
 const stars = new THREE.Points(starGeometry, starMaterial);
 scene.add(stars);
 
+// ===== SHOOTING STARS =====
+const shootingStars = [];
+const shootingStarGeometry = new THREE.BufferGeometry();
+shootingStarGeometry.setAttribute(
+  "position",
+  new THREE.Float32BufferAttribute([
+    0, 0, 0,
+    0, 0, -0.6
+  ], 3)
+);
+
+
+const shootingStarMaterial = new THREE.LineBasicMaterial({
+  color: 0xffffff,
+  transparent: true,
+  opacity: 0.9,
+});
+
+// Create one shooting star
+function spawnShootingStar() {
+  const star = new THREE.Line(
+    shootingStarGeometry,
+    shootingStarMaterial.clone()
+  );
+
+  star.position.set(
+    (Math.random() - 0.5) * 20,
+    Math.random() * 10 + 5,
+    -10
+  );
+
+  // Velocity
+  star.userData.velocity = new THREE.Vector3(
+    Math.random() * 0.25 + 0.15,
+    -Math.random() * 0.15 - 0.1,
+    Math.random() * 0.25 + 0.15
+  );
+
+  // 🔑 ALIGN TRAIL TO VELOCITY
+  const dir = star.userData.velocity.clone().normalize();
+  const quat = new THREE.Quaternion();
+  quat.setFromUnitVectors(new THREE.Vector3(0, 0, -1), dir);
+  star.quaternion.copy(quat);
+
+  star.userData.life = 0;
+
+  scene.add(star);
+  shootingStars.push(star);
+}
+
+
+
 
 
 
@@ -199,6 +251,29 @@ stars.material.opacity = 0.6 + twinkle;
 
 // Subtle size flicker (safe for PointsMaterial)
 stars.material.size = 0.04 + Math.sin(t * 3) * 0.01;
+
+
+// ===== SHOOTING STAR SPAWN (RANDOM) =====
+if (Math.random() < 0.02) {
+  spawnShootingStar();
+}
+
+// ===== UPDATE SHOOTING STARS =====
+for (let i = shootingStars.length - 1; i >= 0; i--) {
+  const star = shootingStars[i];
+
+  star.position.add(star.userData.velocity);
+  star.userData.life++;
+
+  // Fast fade
+  star.material.opacity = Math.max(0, 1 - star.userData.life / 25);
+
+  if (star.userData.life > 25) {
+    scene.remove(star);
+    shootingStars.splice(i, 1);
+  }
+}
+
 
 
 
