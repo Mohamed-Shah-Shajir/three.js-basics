@@ -119,6 +119,16 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x111111);
 document.body.appendChild(renderer.domElement);
 
+// ===== HOVER STATE =====
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let isHovered = false;
+ window.addEventListener("mousemove", (event) => {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+});
+
+
 // Lights
 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
@@ -253,10 +263,13 @@ stars.material.opacity = 0.6 + twinkle;
 stars.material.size = 0.04 + Math.sin(t * 3) * 0.01;
 
 
-// ===== SHOOTING STAR SPAWN (RANDOM) =====
-if (Math.random() < 0.02) {
+// ===== SHOOTING STAR SPAWN (HOVER REACTIVE) =====
+const spawnRate = isHovered ? 0.08 : 0.002;
+
+if (Math.random() < spawnRate) {
   spawnShootingStar();
 }
+
 
 // ===== UPDATE SHOOTING STARS =====
 for (let i = shootingStars.length - 1; i >= 0; i--) {
@@ -273,6 +286,11 @@ for (let i = shootingStars.length - 1; i >= 0; i--) {
     shootingStars.splice(i, 1);
   }
 }
+
+// ===== CHECK HOVER ON SPHERE =====
+raycaster.setFromCamera(mouse, camera);
+const intersects = raycaster.intersectObject(imageSphere);
+isHovered = intersects.length > 0;
 
 
 
